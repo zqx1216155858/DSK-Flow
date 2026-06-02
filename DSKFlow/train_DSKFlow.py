@@ -397,21 +397,7 @@ def main(args):
                                 img_a = transforms.ToTensor()(input_img)
                                 img_a = transforms.Normalize([0.5], [0.5])(img_a).unsqueeze(0).cuda()
                                 deg_tokens_val, deg_mask_val = deg_encoder(img_a)
-                                if idx == 0:
-                                    import cv2
-                                    # import numpy as np
-
-                                    mask_np = deg_mask_val.detach().float().cpu().numpy()
-                                    if mask_np.ndim == 4:
-                                        mask_np = mask_np[0].mean(axis=0)
-                                    else:
-                                        mask_np = mask_np[0]
-                                    # 归一化到 0~255
-                                    mask_np = (mask_np - mask_np.min()) / (mask_np.max() - mask_np.min() + 1e-8)
-                                    heatmap = (mask_np * 255).astype(np.uint8)
-                                    heatmap_color = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
-                                    cv2.imwrite('deg_mask_heatmap.png', heatmap_color)
-                                    print("Heatmap saved via OpenCV.")
+                                
                                 eval_fake_b = DSKFlow.forward_with_networks(img_a,None, "a2b", eval_vae_enc, eval_unet,
                                     eval_vae_dec,  fixed_a2b_emb[0:1],deg_encoder,deg_tokens_val,deg_mask_val)
                                 eval_fake_b_pil = transforms.ToPILImage()(eval_fake_b[0] * 0.5 + 0.5)
